@@ -1,6 +1,5 @@
-Here is a comprehensive `README.md` file tailored for the HEXA TopOpt codebase.
 
-```markdown
+
 # HEXA TopOpt: High-Performance GPU Topology Optimization
 
 **HEXA TopOpt** is a robust, high-performance Finite Element Analysis (FEM) and Topology Optimization solver written in Julia. It is designed to solve large-scale structural compliance minimization problems with stress constraints, utilizing NVIDIA GPUs (CUDA) for massive parallelization.
@@ -15,34 +14,45 @@ The solver features Geometric Multigrid (GMG) preconditioning, Adaptive Mesh Ref
 * **Geometric Multigrid (GMG):** Memory-efficient matrix-free multigrid preconditioner allowing for solves on meshes with millions of elements.
 * **Adaptive Mesh Refinement:** Starts with a coarse grid and progressively refines the mesh around active design regions to capture fine details without checking memory limits.
 * **Robust Optimization:**
-    * Stress-constrained topology optimization.
-    * Explicit density filtering (Gaussian-like diffusion).
-    * Strict void/solid region enforcement (geometric primitives).
+* Stress-constrained topology optimization.
+* Explicit density filtering (Gaussian-like diffusion).
+* Strict void/solid region enforcement (geometric primitives).
+
+
 * **Production Ready IO:**
-    * **Input:** Modular YAML configuration files.
-    * **Output:** VTK (`.vti`) for Paraview, Watertight STL (`.stl`) for manufacturing, and binary checkpoints.
-    * **Batch Processing:** Queue multiple simulation cases with override capabilities.
+* **Input:** Modular YAML configuration files.
+* **Output:** VTK (`.vti`) for Paraview, Watertight STL (`.stl`) for manufacturing, and binary checkpoints.
+* **Batch Processing:** Queue multiple simulation cases with override capabilities.
+
+
 
 ---
 
 ## 📦 Installation
 
 ### Prerequisites
-1.  **Julia:** Version 1.6 or higher.
-2.  **Hardware:** NVIDIA GPU (RTX, V100, A100, H100) recommended. CPU mode is available but significantly slower.
-3.  **Drivers:** CUDA toolkit compatible with your GPU.
+
+1. **Julia:** Version 1.6 or higher.
+2. **Hardware:** NVIDIA GPU (RTX, V100, A100, H100) recommended. CPU mode is available but significantly slower.
+3. **Drivers:** CUDA toolkit compatible with your GPU.
 
 ### Setup
-1.  Clone the repository:
-    ```bash
-    git clone [https://github.com/your-username/HEXA_TopOpt.git](https://github.com/your-username/HEXA_TopOpt.git)
-    cd HEXA_TopOpt
-    ```
 
-2.  Instantiate the environment (this installs required packages like `CUDA.jl`, `LinearAlgebra`, `YAML`, etc.):
-    ```bash
-    julia --project=. -e 'using Pkg; Pkg.instantiate()'
-    ```
+1. Clone the repository:
+```bash
+git clone https://github.com/your-username/HEXA_TopOpt.git
+cd HEXA_TopOpt
+
+```
+
+
+2. Instantiate the environment (this installs required packages like `CUDA.jl`, `LinearAlgebra`, `YAML`, etc.):
+```bash
+julia --project=. -e 'using Pkg; Pkg.instantiate()'
+
+```
+
+
 
 ---
 
@@ -51,6 +61,7 @@ The solver features Geometric Multigrid (GMG) preconditioning, Adaptive Mesh Ref
 The entry point for the software is `Run.jl`. This script handles environment activation, hardware checks, and launches the simulation batch processor.
 
 ### Basic Execution
+
 To run the simulations defined in `configs/optimization_cases.yaml`:
 
 ```bash
@@ -139,20 +150,3 @@ Results are saved in the `RESULTS/<job_name>` directory:
 * **`*_animation.pvd`**: Time-series file to animate the optimization process in ParaView.
 * **`simulation_log.txt`**: Detailed convergence logs (compliance, volume fraction, stability metrics).
 
----
-
-## 🛠 Troubleshooting
-
-* **UndefVarError: f0**: If you encounter this in `Boundary.jl`, ensure your float literals use correct syntax (e.g., use `1.0f-5`, not mixed notation like `1.0e-5f0`).
-* **OOM (Out of Memory):** Delete `configs/_machine_limits.jl` and restart `Run.jl`. The launcher will re-run the VRAM stress test to calibrate for your current hardware.
-* **Instability:** If the solution explodes, check your `boundary_conditions`. Ensure your constraints prevent rigid body motion in all 3 axes.
-
----
-
-## License
-
-This project is released under the MIT License.
-
-```
-
-```
