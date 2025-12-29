@@ -1,0 +1,111 @@
+# FILE: .\configs\domain_definitions.yaml
+# ==============================================================================
+# PART 1: PHYSICAL PROBLEM DEFINITION
+# ==============================================================================
+# This file contains the "What": Geometry, Loads, BCs, and Materials.
+
+# ------------------------------------------------------------------------------
+# GEOMETRY DEFINITION
+# ------------------------------------------------------------------------------
+geometry:
+  # Physical dimensions (meters)
+  length_x: 60
+  length_y: 20
+  length_z: 20
+  
+  # Geometric primitives (Design/Non-Design regions)
+  # NEW SCHEMA:
+  # properties:
+  #   stiffness_ratio:   Multiplier for Young's Modulus (0 = Void)
+  #   specific_mass:     Override for density (kg/m3). If stiffness=0, this is forced to 0.
+  #   thermal_expansion: Override for alpha coefficient.
+
+  sphere1:
+    type: sphere
+    center: [12.51, 28.49, 50]
+    diameter: 8
+    properties:
+      stiffness_ratio: 0        # Void
+      specific_mass: 0          # No mass
+      thermal_expansion: 0
+    
+  sphere2:
+    type: sphere
+    center: [60.38, -0.07, 50]
+    diameter: 4
+    properties:
+      stiffness_ratio: 10       # Stiff inclusion (10x E)
+      specific_mass: 7850       # Heavy inclusion (Steel density)
+      thermal_expansion: 1.2e-5 # Standard thermal expansion
+    
+  sphere3:
+    type: sphere
+    center: [34.29, 5, 50]
+    diameter: 4
+    properties:
+      stiffness_ratio: 1        # Normal Stiffness
+      specific_mass: 100        # Light material
+      thermal_expansion: 2.0e-4 # High thermal expansion (Active Thermal)
+      
+  box1:
+    type: box
+    center: [28, 15, 50]
+    size: [1, 2, 3]
+    stiffness_ratio: 5          # Legacy syntax supported (implies mass=global, alpha=0)
+      
+  box2:
+    type: box
+    center: [45.06, 8.95, 50]
+    size: [1, 4, 2]
+    stiffness_ratio: 0          # Void box
+
+  box3:
+    type: box
+    center: [40, 9, 5]
+    size: [90, 0.6, 12]
+    properties:
+      stiffness_ratio: 1
+      specific_mass: 0.021
+      thermal_expansion: 0
+
+# ------------------------------------------------------------------------------
+# BOUNDARY CONDITIONS
+# ------------------------------------------------------------------------------
+boundary_conditions:
+  - location: [0, 0, ':'] # Fix X=0 face
+    DoFs: [1, 2, 3]         # Fully fixed
+
+# ------------------------------------------------------------------------------
+# EXTERNAL FORCES
+# ------------------------------------------------------------------------------
+external_forces:
+  - name: Y10
+    location: [100%, 0, 0]
+    F: [0, 10, 0]
+    
+  - name: Z-10
+    location: [100%, 0, 50%]
+    F: [0, 0, -10]
+    
+  - name: Y20
+    location: [100%, 0, 100%]
+    F: [0, 20, 0]
+    
+  - name: Mid_Y20
+    location: [50%, 0, 50%]
+    F: [0, 15, 0]
+
+# ------------------------------------------------------------------------------
+# MATERIAL PROPERTIES
+# ------------------------------------------------------------------------------
+material:
+  E: 1                      # Young's Modulus (Base)
+  nu: 0.3                   # Poisson's Ratio
+  material_density: 0.001   # Global Base specific mass (kg/m3) for self-weight
+  gravity_acceleration: 10.0
+  delta_temperature: 0.0
+ 
+
+ # Asymmetric Stress Limits (Positive Values)
+  l1_stress_allowable_tension: 1.
+  l1_stress_allowable_compression: 1.

@@ -1,0 +1,106 @@
+# FILE: .\configs\solver_settings.yaml
+# ==============================================================================
+# PART 2: NUMERICAL SOLVER & OPTIMIZATION SETTINGS
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# HARDWARE PROFILE
+# ------------------------------------------------------------------------------
+gpu_profile: "RTX" 
+
+# ------------------------------------------------------------------------------
+# RESTART CONFIGURATION
+# ------------------------------------------------------------------------------
+restart_configuration:
+  enable_restart: false
+  file_path: ""
+
+# ------------------------------------------------------------------------------
+# MESH & ADAPTIVITY SETTINGS
+# ------------------------------------------------------------------------------
+mesh_settings:
+  initial_ground_mesh_size: 15_000_000
+  final_target_of_active_elements: 15_000_000
+  
+  max_growth_rate: 1.1
+  nominal_refinement_threshold: 0.9
+  # exponent_for_refinement_schedule REMOVED (Unused)
+  max_background_elements: 800_000_000
+  gpu_solver_safety_factor: 0.95
+
+# ------------------------------------------------------------------------------
+# OPTIMIZATION LOOP
+# ------------------------------------------------------------------------------
+number_of_iterations: auto
+hard_stop_after_iteration: 200
+
+optimization_parameters:
+  density_update_method: "hard"
+
+  min_density: 0.0001
+  density_clamp_max: 1
+  
+  # AGGRESSIVE CULLING CONFIGURATION
+  # ---------------------------------------------------------
+  max_culling_ratio: 0.20    # Allow up to 20% of elements to die per step
+  starting_density_threshold: 0.02 # Starting cutoff value
+  final_density_threshold: 0.90
+  exponent_for_cutoff_schedule: 1.0 # Controls how fast the cutoff rises (Lower = Faster rise)
+  # ---------------------------------------------------------
+
+  # FILTER RADIUS (Decay Faster)
+  minimum_feature_size_physical: 0.1
+  minimum_feature_size_elements: 1.5 
+
+  radius_max_multiplier: 1.0 
+  radius_min_multiplier: 1.0  
+  radius_decay_exponent: 0.8  # Drop radius quickly to allow fine details
+  
+ 
+
+# ------------------------------------------------------------------------------
+# STRESS CONTROLLER SETTINGS
+# ------------------------------------------------------------------------------
+# PID and logic parameters for the adaptive stress constraint controller
+stress_controller:
+  Kp: 0.02
+  Ki: 0.005
+  integral_error_limit: 50.0        # Clamp for integral windup (-50, +50)
+  max_adjustment_pct: 0.05          # Max adjustment per iter (+/- 5%)
+  state_switch_error_low: 0.05      # 5% error threshold to trigger Relaxing
+  state_switch_error_high: 0.15     # 15% error threshold (if variance is high)
+  min_variance_for_switch: 0.25     # Min stress variance to allow high-error switch
+  metric_percentile: 0.95           # Percentile for stress metric (95th)
+
+# ------------------------------------------------------------------------------
+# SOLVER PARAMETERS
+# ------------------------------------------------------------------------------
+solver_parameters:
+  solver_type: gpu              
+  preconditioner: "multigrid"
+  tolerance: 1.e-6 
+  max_iterations: 30000 
+  diagonal_shift_factor: 1.e-7 
+  stagnation_tolerance: 1.0e-3
+  max_shift_attempts: 7
+  shift_multiplier: 10.0
+  gpu_method: krylov        
+  krylov_solver: cg               
+
+# ------------------------------------------------------------------------------
+# OUTPUT SETTINGS
+# ------------------------------------------------------------------------------
+output_settings:
+  export_frequency: 1        
+  save_bin_frequency: 1     
+  save_STL_frequency: 1     
+  save_VTK_frequency: 1     
+  save_principal_stress_vectors: yes
+  save_displacement_vectors: yes
+  log_filename: 00_simulation_log.txt
+  iso_surface_threshold: 0.01
+  stl_subdivision_level: 0        
+  stl_smoothing_passes: 1         
+  stl_mesh_smoothing_iters: 3     
+  maximum_cells_in_binary_output: 25_000_000
+  stl_target_triangle_count: 500000

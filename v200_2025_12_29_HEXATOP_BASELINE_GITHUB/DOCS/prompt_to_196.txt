@@ -1,0 +1,26 @@
+You are an expert Julia developer specializing in Finite Element Analysis and Topology Optimization. 
+
+Take the codebase (provided in the context) and modify it to implement the following specific features, while strictly preserving the integrity of the FEA/Stress mathematics.
+
+Features to Implement:
+
+Asymmetric Stress Limits:Modify src/Core/Stress.jl: Update the L1-norm calculation to carry a sign. If the magnitude of the minimum principal stress ($|s_3|$, compression) is greater than the maximum ($|s_1|$, tension), the L1 value should be negative. 
+
+CRITICAL: Do not change the Jacobian, B-matrix, or Eigenvalue logic from the code. Only change the final assignment of the L1 scalar.
+
+Modify configs/domain_definitions.yaml: Replace l1_stress_allowable with l1_stress_allowable_tension and l1_stress_allowable_compression.
+
+Controller Logic:Modify src/App/SimulationLoop.jl: Update the PID controller to handle the signed L1 field. Calculate utilization as abs(stress) / abs(limit_tension) (if positive) or abs(stress) / abs(limit_compression) (if negative).
+
+Density Update:Modify src/Optimization/DensityUpdate.jl: Accept both tension and compression limits. Use the abs() of the user-provided limits to ensure safety. Apply the correct limit based on the sign of the local stress.
+
+Diagnostics:Modify src/Utils/Diagnostics.jl: Add a Weight column to the iteration log to track total mass.
+
+Web Export:Modify src/IO/Postprocessing/WebExport.jl: Export the signed L1 stress correctly for visualization.
+
+Refinement:Modify src/Mesh/MeshRefiner.jl: Update the estimate_element_memory_cost_bytes function (set to 180 bytes for >500M elements, 220 otherwise).
+
+Constraints:
+ Do not abbreviate code. 
+ Write the modified files in their entirety.
+ Safety First: If a config value for stress allowable is negative (e.g. -1.5), treat it as positive (1.5) in the math to avoid division by zero or sign errors.

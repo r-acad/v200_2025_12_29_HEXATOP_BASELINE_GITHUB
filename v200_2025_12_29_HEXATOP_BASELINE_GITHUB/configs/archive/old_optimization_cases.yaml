@@ -1,0 +1,59 @@
+# FILE: .\configs\optimization_cases.yaml
+# ==============================================================================
+# OPTIMIZATION CASES ORCHESTRATOR
+# ==============================================================================
+# This file defines a sequence of simulations to run. 
+# It merges a physics definition with a solver definition for each run.
+#
+# HOW TO USE OVERRIDES:
+# You can add an 'overrides' section to any job to change specific parameters
+# without creating a whole new config file. The structure must match the 
+# nesting of the original config files.
+
+batch_queue:
+  # ----------------------------------------------------------------------------
+  # Run 1: Baseline (Uses files exactly as they are)
+  # ----------------------------------------------------------------------------
+  - job_name: "Case_1_Baseline"
+    domain_config: "./configs/domain_definitions.yaml"
+    solver_config: "./configs/solver_settings.yaml"
+
+  # ----------------------------------------------------------------------------
+  # Run 2: High Resolution Test (Override Mesh Settings)
+  # ----------------------------------------------------------------------------
+  - job_name: "Case_2_HighRes"
+    domain_config: "./configs/domain_definitions.yaml"
+    solver_config: "./configs/solver_settings.yaml"
+    overrides:
+      mesh_settings:
+        initial_ground_mesh_size: 2_000_000
+        final_target_of_active_elements: 10_000_000
+        max_growth_rate: 1.2
+
+  # ----------------------------------------------------------------------------
+  # Run 3: Aggressive Culling (Override Optimization Parameters)
+  # ----------------------------------------------------------------------------
+  - job_name: "Case_3_Aggressive"
+    domain_config: "./configs/domain_definitions.yaml"
+    solver_config: "./configs/solver_settings.yaml"
+    overrides:
+      optimization_parameters:
+        max_culling_ratio: 0.30        # Increase culling speed
+        density_update_method: "soft"  # Change update logic
+        radius_max_multiplier: 5.0     # Larger start radius
+
+  # ----------------------------------------------------------------------------
+  # Run 4: Stiffer Material (Override Physics/Domain Definitions)
+  # ----------------------------------------------------------------------------
+  - job_name: "Case_4_Steel"
+    domain_config: "./configs/domain_definitions.yaml"
+    solver_config: "./configs/solver_settings.yaml"
+    overrides:
+      material:
+        E: 210.0  # Change Young's Modulus
+        nu: 0.28  # Change Poisson's Ratio
+      external_forces:
+        # Note: Overriding lists usually replaces the whole list
+        - name: "Force_Overridden"
+          location: [100%, 0, 0]
+          F: [0, 500, 0]
